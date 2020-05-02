@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+    name: dev-environment
+    namespace: testingsystem
+    labels:
+      app: dev
+
+
+---
+
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+    name: dev-role
+    namespace: testingsystem
+    labels:
+      app: dev
+
+rules:
+-  apiGroups:
+   - ""
+   resources:
+    - pods
+    - services
+    - secrets
+    - namespaces
+    - endpoints
+    - configmaps
+    - persistentvolumeclaims
+    - events  
+    - deployments
+   verbs:
+    - get
+    - list
+    - watch
+    - create
+    - update
+    - delete
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+    name: dev-rolebinding
+    namespace : testingsystem
+    labels:
+      app: dev
+subjects:
+- kind: ServiceAccount
+  name: dev-environment
+  apiGroup: ""
+roleRef:
+  kind: Role
+  name: dev-role
+  apiGroup: ""

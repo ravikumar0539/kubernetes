@@ -1,0 +1,49 @@
+apiversion: apps/v1
+kind: Deployment
+metadata:
+    name: tomcatdeployment
+spec:
+  serviceAccountName: dev-environment
+  replicas: 2
+  selector:
+    matchLabels:
+        app: tomcat
+  template:
+    metadata:
+      labels:
+        app: tomcat
+    spec:
+      serviceAccountName: dev-environment
+      containers:
+        - name: tomcat
+          image: tomcat:latest
+          ports:
+          - name: tomcatport 
+            containerPort: 8080
+          volumeMounts:
+          - name: config-volume
+            mountPath: /usr/local/tomcat/bin
+          resource:
+            requests:
+                cpu: 500m
+                memory: 8g
+          livenessProbe:
+            httpGet:
+              path: / 
+              port: tomcatport
+            initialDelaySeconds: 15
+            timeoutSeconds: 30
+          readinessprobe:
+            httpGet:
+              path: / 
+              port: tomcatport
+            initialDelaySeconds: 15
+            timeoutSeconds: 30
+
+      volumes:
+      - name: config-volume
+        configMap:
+            name: setconfig
+            items:
+            - key: setenv.sh
+              path: setenv.sh          

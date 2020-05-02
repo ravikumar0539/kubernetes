@@ -1,0 +1,14 @@
+apiversion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: tomcat
+spec:
+  serviceAccountName: dev-environment
+  scaleTargetRef:
+    apiversion: apps/v1
+    kind: Deployment
+    name: tomcatdeployment
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 95
+  

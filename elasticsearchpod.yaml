@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: dev-elasticsearch
+  labels:
+    app: develasticsearch
+    test: elasticsearch
+spec:
+    serviceAccountName: dev-environment
+    selector:
+        matchLabels:
+            app: elasticsearch
+            version: 7.4
+    template:
+      metadata:
+          labels:
+            app: elasticsearch
+            version: 7.4
+      spec:
+        serviceAccountName: dev-environment
+        containers:
+          - image: quay.io/fluentd_elasticsearch/elasticsearch:v7.4.2
+            name: elasticsearch-image
+            imagePullPolicy: Always
+            resources:
+          # need more cpu upon initialization, therefore burstable class
+              limits:
+                cpu: 1000m
+                memory: 3Gi
+              requests:
+                cpu: 100m
+                memory: 3Gi
+            ports:
+              - containerPort: 9200
+                name: elasticport
+                protocol: TCP
+              - containerPort: 9300
+                name: transport
+                protocol: TCP
+            livenessProbe:
+              tcpSocket:
+                  port: transport
+                  initialDelaySeconds: 5
+                  timeoutSeconds: 10
+            readinessProbe:
+              tcpSocket:
+                  port: transport
+                  initialDelaySeconds: 5
+                  timeoutSeconds: 10
+            volumeMounts:
+              - name: elasticsearch-devvolume
+                mountPath: /data
+volumes:
+  - name: elasticsearch-devvolume
+    emptyDir: {}
+initContainers:
+      - image: alpine:3.6
+        command: ["/sbin/sysctl", "-w", "vm.max_map_count=262144"]
+        name: elasticsearch-logging-init
+        securityContext:
+          privileged: true

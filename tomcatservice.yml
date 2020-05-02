@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Service
+metadata:
+    name: tomcatservice
+    labels:
+        app: tomcatservice
+   # annotations:
+    #  service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "arn:aws:acm:region:accountid:certificate/..."
+     # service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "http"
+      #service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "443"
+      #service.beta.kubernetes.io/aws-load-balancer-connection-draining-enabled: "true"
+      #service.beta.kubernetes.io/aws-load-balancer-connection-draining-timeout: "60"
+      #service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: "name=dev,app=tomcat"
+spec:
+  serviceAccountName: dev-environment
+  ports:
+    - name: http 
+      port: 80
+      targetPort: tomcatport
+      protocol: tcp
+    - name: https
+      port: 443
+      targetPort: tomcatport
+      protocol:  tcp
+  selector:
+    app: tomcat  
+  #type: loadbalaner
