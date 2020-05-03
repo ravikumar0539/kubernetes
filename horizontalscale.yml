@@ -2,6 +2,7 @@ apiversion: autoscaling/v1
 kind: HorizontalPodAutoscaler
 metadata:
   name: tomcat
+  namespace: testingsystem
 spec:
   serviceAccountName: dev-environment
   scaleTargetRef:

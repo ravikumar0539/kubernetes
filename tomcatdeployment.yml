@@ -2,8 +2,8 @@ apiversion: apps/v1
 kind: Deployment
 metadata:
     name: tomcatdeployment
+    namespace: testingsystem
 spec:
-  serviceAccountName: dev-environment
   replicas: 2
   selector:
     matchLabels:
@@ -23,6 +23,9 @@ spec:
           volumeMounts:
           - name: config-volume
             mountPath: /usr/local/tomcat/bin
+          - name: secret-volume
+            mountPath: /usr/local/tomcat
+            readOnly: true
           resource:
             requests:
                 cpu: 500m
@@ -46,4 +49,10 @@ spec:
             name: setconfig
             items:
             - key: setenv.sh
-              path: setenv.sh          
+              path: setenv.sh
+      - name: secret-volume
+        secret:
+            name: mysecret
+            items:
+            - key: .test
+              path: .test

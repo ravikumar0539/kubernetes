@@ -1,0 +1,14 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: ingress 
+metadata:
+  name: tomcatingressrules
+  namespace: testingsystem
+spec:
+  rules:
+  - host: tomcat1.testing.in
+    http:
+      paths:
+      - path: / 
+        backend:
+          serviceName: tomcatservice
+          servicePort: 8080 

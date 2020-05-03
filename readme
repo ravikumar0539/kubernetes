@@ -1,0 +1,5 @@
+#Create config map
+kubectl create configmap setconfig --from-file=setenv.sh --namespace testingsystem
+
+#Creating aws ebs volume
+aws ec2 create-volume --size 10 --region us-east-1 --availabiltiy-zone us-east-1a --volume-type gp2

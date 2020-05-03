@@ -2,11 +2,13 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: dev-elasticsearch
+  namespace: testingsystem
   labels:
     app: develasticsearch
     test: elasticsearch
 spec:
-    serviceAccountName: dev-environment
+    serviceName: elasticsearch
+    replicas: 3
     selector:
         matchLabels:
             app: elasticsearch
@@ -17,7 +19,14 @@ spec:
             app: elasticsearch
             version: 7.4
       spec:
+        terminationGracePeriodSeconds: 1800
         serviceAccountName: dev-environment
+        initContainers:
+      # init-container for setting the mmap count limit
+          - name: sysctl
+            image: busybox
+            imagePullPolicy: IfNotPresent
+            command: ["sysctl", "-w", "vm.max_map_count=262144"]
         containers:
           - image: quay.io/fluentd_elasticsearch/elasticsearch:v7.4.2
             name: elasticsearch-image
@@ -28,7 +37,7 @@ spec:
                 cpu: 1000m
                 memory: 3Gi
               requests:
-                cpu: 100m
+                cpu: 400m
                 memory: 3Gi
             ports:
               - containerPort: 9200
@@ -50,9 +59,16 @@ spec:
             volumeMounts:
               - name: elasticsearch-devvolume
                 mountPath: /data
-volumes:
-  - name: elasticsearch-devvolume
-    emptyDir: {}
+volumeClaimTemplates:
+- metadata:
+    name: elasticsearch-devvolume
+  spec:
+    accessModes: [ ReadWriteOnce ]
+    resources:
+     requests:
+       storage: 8Gi
+    storageClassName: testingstandard
+    
 initContainers:
       - image: alpine:3.6
         command: ["/sbin/sysctl", "-w", "vm.max_map_count=262144"]

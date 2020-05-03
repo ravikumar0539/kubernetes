@@ -2,6 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
     name: tomcatservice
+    namespace: testingsystem
     labels:
         app: tomcatservice
    # annotations:

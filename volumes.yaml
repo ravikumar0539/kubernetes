@@ -1,0 +1,41 @@
+kind: StorageClass
+apiVersion: storage.k8s.io/v1beta1
+metadata:
+    name: testingstandard
+provisioner: kubernetes.io/aws-ebs
+parameters:
+  type: gp2
+  zone: us-east-1a
+
+---
+
+# kind: PersistentVolumeClaim
+# apiVersion: v1 
+# metadata:
+#   name: testingclaim
+#   annotations:
+#     volume.beta.kubernetes.io/storage-class: "testingstandard"
+# spec:
+#   accessModes:
+#     - ReadWriteOnce
+#   resources:
+#     requests:
+#       storage: 8Gi (PersistentVolumeClaim: claimName:testingclaim define in pod file ) 
+
+---
+
+apiVersion: settings.k8s.io/v1alpha1
+kind: PodPreset
+metadata:
+  name: updatecredentials
+spec:
+  selector:
+    matchLabels:
+      app: dev
+  volumeMounts:
+    - mountPath : /share
+      name: shared-volume
+  volumes:
+    - name:  shared-volume
+      emptyDir: {}
+          
